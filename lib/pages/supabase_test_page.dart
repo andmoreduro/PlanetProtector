@@ -9,29 +9,28 @@ class SupabaseTestPage extends StatefulWidget {
 }
 
 class _SupabaseTestPageState extends State<SupabaseTestPage> {
-  final _countriesStream = Supabase.instance.client
+  final _future = Supabase.instance.client
       .from('countries')
-      .stream(primaryKey: ['id']);
+      .select();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _countriesStream,
+      body: FutureBuilder(
+        future: _future,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator()
-            );
+            return const Center(child: CircularProgressIndicator());
           }
           final countries = snapshot.data!;
           return ListView.builder(
             itemCount: countries.length,
-            itemBuilder: (context, index) {
+            itemBuilder: ((context, index) {
+              final country = countries[index];
               return ListTile(
-                title: Text(countries[index]['name']),
+                title: Text(country['name']),
               );
-            }
+            }),
           );
         },
       ),
